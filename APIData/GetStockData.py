@@ -11,12 +11,6 @@ to_date = datetime.strptime(sys.argv[2], '%Y-%m-%d').date()
 
 dfs = {}
 
-#This will loop through the ENUM and fetch and store the OLHC value as per the stock name in a dictionary.
-for key in ApiParameter:
-  df_name = f'{key.name}'  # Name of DataFrame
-  df = fetch_data_and_create_df(key.value, from_date, to_date)
-  dfs[df_name] = df
-
 #Fetches the data from the API and stores it in a df and returns the df.
 def fetch_data_and_create_df(parameter, from_date, to_date):
 	url = f"https://api.upstox.com/v2/historical-candle/NSE_EQ|{parameter}/day/{to_date}/{from_date}"
@@ -43,6 +37,13 @@ def fetch_data_and_create_df(parameter, from_date, to_date):
 
 	except Exception as e:
 		print(e)
+
+
+#This will loop through the ENUM and fetch and store the OLHC value as per the stock name in a dictionary.
+for key in ApiParameter:
+  df_name = f'{key.name}'  # Name of DataFrame
+  df = fetch_data_and_create_df(key.value, from_date, to_date)
+  dfs[df_name] = df
 
 #Print the df as per the stock name
 print(dfs['Bajaj_Finance'])
