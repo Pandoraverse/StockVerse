@@ -1,0 +1,9 @@
+pandas
+scikit-learn
+matplotlib
+seaborn
+requests
+openpyxl
+numpy
+sqlalchemy
+configparser
