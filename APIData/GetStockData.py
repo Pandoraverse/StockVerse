@@ -22,21 +22,23 @@ def fetch_data_and_create_df(parameter, from_date, to_date):
 		response = requests.request("GET", url, headers=headers, data=payload)
 		if(response.status_code == 200):
 			response = json.loads(response.text)
-
+			stock_data = []
 			#Loops through the response JSON and stores the OLHC value in a df.
 			for data in response['data']['candles']:
 				stock_data.append(data)
-				columns = ["Date", "Open", "High", "Low","Close","Volume", "Open Interest"]
-				df = pd.DataFrame(stock_data, columns=columns)
-				df['Date'] = pd.to_datetime(df['Date']).dt.date
-
+			
+			# Create DataFrame after collecting all data
+			columns = ["Date", "Open", "High", "Low","Close","Volume", "Open Interest"]
+			df = pd.DataFrame(stock_data, columns=columns)
+			df['Date'] = pd.to_datetime(df['Date']).dt.date
+			return df
 		else:
 			print("Something Went Wrong", response.text)
-
-		return df
+			return None
 
 	except Exception as e:
 		print(e)
+		return None
 
 
 #This will loop through the ENUM and fetch and store the OLHC value as per the stock name in a dictionary.
@@ -46,4 +48,4 @@ for key in ApiParameter:
   dfs[df_name] = df
 
 #Print the df as per the stock name
-print(dfs['Bajaj_Finance'])
+print(dfs)
