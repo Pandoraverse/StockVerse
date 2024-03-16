@@ -4,6 +4,8 @@ import pandas as pd
 from StockEnum import ApiParameter
 import sys
 from datetime import datetime
+from sqlalchemy import create_engine, MetaData, Table
+from Read_Properties import load_properties
 
 stock_data = []
 from_date =  datetime.strptime(sys.argv[1], '%Y-%m-%d').date()
@@ -41,11 +43,19 @@ def fetch_data_and_create_df(parameter, from_date, to_date):
 		return None
 
 
-#This will loop through the ENUM and fetch and store the OLHC value as per the stock name in a dictionary.
+
+def add_data_to_db():
+	#use this line to get the connection string from the properties file and modify/delete this method as per the need.
+	conn_str = str(load_properties("conn_str"))
+
+
+
+# This will loop through the ENUM and fetch and store the OLHC value as per the stock name in a dictionary.
 for key in ApiParameter:
   df_name = f'{key.name}'  # Name of DataFrame
-  df = fetch_data_and_create_df(key.value, from_date, to_date)
+  #df = fetch_data_and_create_df(key.value, from_date, to_date)
   dfs[df_name] = df
 
-#Print the df as per the stock name
+# Print the df as per the stock name
 print(dfs)
+
