@@ -38,7 +38,7 @@ class StockDataProcessor:
     @staticmethod
     def process_stock_data(df):
         if df is not None:
-            df.columns = ["Date", "Open", "High", "Low", "Close", "Volume", "Open Interest"]
+            df.columns = ["Date", "Open", "High", "Low", "Close", "Volume", "Open_Interest"]
             df['Date'] = pd.to_datetime(df['Date']).dt.date
         return df
 
