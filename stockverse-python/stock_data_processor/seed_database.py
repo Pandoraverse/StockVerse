@@ -8,7 +8,7 @@ class SeedDatabase:
 
     def persist_all(self, table_name, df):
         if df is not None:
-            df.to_sql(table_name, self.engine, if_exists='replace', index=False)
+            df.to_sql(table_name, self.engine, if_exists='append', index=False)
             print(f"Data added to {table_name} table.")
         else:
             print(f"No data for {table_name}.")
