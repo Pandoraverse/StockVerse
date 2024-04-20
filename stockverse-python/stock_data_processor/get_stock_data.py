@@ -9,9 +9,10 @@ class GetStockDetails:
         self.engine = create_engine(self.conn_str, connect_args={'timeout': 180})
 
     def get_stock_details(self, stock_name):
-        if not '_data' in stock_name:
+        if not '_Data' in stock_name:
             stock_name = f"{stock_name}_Data"
         df = pd.read_sql_table(stock_name, self.engine)
+        df['Open_Interest'] = df['Open_Interest'].astype('int64')
         return df
     
 def main():
