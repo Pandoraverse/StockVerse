@@ -28,7 +28,7 @@ class DatabaseHandler:
         return extra_rows_api_df
     
     def get_data(self, stock_name):
-        db_df = GetStockDetails.get_stock_details(self, stock_name).drop(columns=['Id', 'Reserved_Field_1','Reserved_Field_2','Reserved_Field_3','Reserved_Field_4','Reserved_Field_5'], axis = 1, inplace = False)
+        db_df = GetStockDetails.get_stock_details(self, stock_name).drop(columns=['Id', 'Open_Interest', 'Reserved_Field_1','Reserved_Field_2','Reserved_Field_3','Reserved_Field_4','Reserved_Field_5'], axis = 1, inplace = False)
         return db_df
         
     def persist_all(self, table_name, df):
