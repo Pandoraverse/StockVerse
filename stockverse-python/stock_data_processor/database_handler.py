@@ -2,7 +2,8 @@ from sqlalchemy import create_engine
 from read_properties import load_properties
 from get_stock_data import GetStockDetails
 import pandas as pd
-class SeedDatabase:
+
+class DatabaseHandler:
     def __init__(self):
         self.conn_str = load_properties("conn_str")
         self.engine = create_engine(self.conn_str, connect_args={'timeout': 180})
@@ -25,10 +26,14 @@ class SeedDatabase:
         extra_dates = list(set(api_dates) - set(db_dates))
         extra_rows_api_df = api_df.loc[extra_dates].sort_index(axis = 0, ascending=True).reset_index()
         return extra_rows_api_df
-
+    
+    def get_data(self, stock_name):
+        db_df = GetStockDetails.get_stock_details(self, stock_name).drop(columns=['Id', 'Open_Interest', 'Reserved_Field_1','Reserved_Field_2','Reserved_Field_3','Reserved_Field_4','Reserved_Field_5'], axis = 1, inplace = False)
+        return db_df
+        
     def persist_all(self, table_name, df):
         if df is not None:
-            unique_df = SeedDatabase.compare_data(self, df, table_name)
+            unique_df = DatabaseHandler.compare_data(self, df, table_name)
             if not unique_df.empty:
                 unique_df.to_sql(table_name, self.engine, if_exists='append', index=False)
                 print(f"Data added to {table_name} table.")

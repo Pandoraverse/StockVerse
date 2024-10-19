@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from seed_database import SeedDatabase
+from database_handler import DatabaseHandler
 from StockEnum import NSEScripts
 from api_controller import ApiController
 
@@ -50,7 +50,7 @@ def main():
 
     stock_data_fetcher = StockDataFetcher(from_date, to_date)
     stock_data_processor = StockDataProcessor()
-    seed_db = SeedDatabase()
+    seed_db = DatabaseHandler()
 
     for key in NSEScripts:
         df = stock_data_fetcher.fetch_stock_data(key)
@@ -58,7 +58,5 @@ def main():
         table_name = f"{key.name}_Data"
         seed_db.persist_all(table_name, df_processed)
 
-#To ensure that the main() function is only executed if the script is run directly as the main program, 
-#And not when it is imported as a module into another script.
 if __name__ == "__main__":
     main()
