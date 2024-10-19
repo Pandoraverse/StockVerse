@@ -15,6 +15,38 @@ def stochastic_oscillator(df, periods = 14):
   K = (num / denom) * 100    
   return K
 
+def calculate_stoch_rsi(df, period=14):
+    # Calculate RSI
+    delta = df['Close'].diff(1)
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+
+    # Calculate Stochastic RSI
+    stoch_rsi = ((rsi - rsi.rolling(window=period).min()) /
+                 (rsi.rolling(window=period).max() - rsi.rolling(window=period).min()))
+    
+    return stoch_rsi * 100
+
+def calculate_tsi(df, short_window=25, long_window=13):
+    # Calculate the price changes
+    delta = df['Close'].diff(1)
+    
+    # Calculate double smoothed EMA of positive changes
+    abs_delta = abs(delta)
+    double_smoothed_delta = df["EMA5"].ewm(span=5).mean()
+    double_smoothed_abs_delta = abs_delta.ewm(span=5).mean()
+    
+    # Calculate TSI
+    tsi = 100 * (double_smoothed_delta / double_smoothed_abs_delta)
+    return tsi
+
+def calculate_vwap(df):
+    # Ensure the DataFrame has 'Close', 'Volume', 'High', and 'Low' columns
+    typical_price = (df['Close'] + df['High'] + df['Low']) / 3
+    return(typical_price * df['Volume']).cumsum() / df['Volume'].cumsum()
+
 def extract_technical_features(df):
     df["STOCHOSC"] = stochastic_oscillator(df)
     # 1. Moving Averages
@@ -22,6 +54,7 @@ def extract_technical_features(df):
     df['EMA5'] = df['Close'].ewm(span=10, adjust=False).mean()
     df['SMA20'] = df['Close'].rolling(window=20).mean()
     df['EMA20'] = df['Close'].ewm(span=20, adjust=False).mean()
+    df['SMA34'] = df['Close'].rolling(window=34).mean()
     df['SMA50'] = df['Close'].rolling(window=50).mean()
     df['EMA50'] = df['Close'].ewm(span=50, adjust=False).mean()
     df['SMA100'] = df['Close'].rolling(window=100).mean()
@@ -54,6 +87,11 @@ def extract_technical_features(df):
 
     # Additional features can be added similarly
 
+    #Adding AO, Stoch RSI, TSI and VWAP
+    df['AO'] = df['SMA5'] - df['SMA34']
+    df["STOCHRSI"] = calculate_stoch_rsi(df)
+    df["TSI"] = calculate_tsi(df)
+    df["VWAP"] = calculate_vwap(df)
     # Drop rows with NaN values that result from rolling window operations
     df.dropna(inplace=True)
     #df = df.drop(columns = 'Date')
@@ -70,8 +108,8 @@ def main():
     db_handler =  DatabaseHandler()
     df = db_handler.get_data(StockEnum.NSEScripts.Tata_Steel.name)
     stock_df_with_features = extract_technical_features(df)
-    #stock_df_with_features.plot.line(y="Close", x = "Date", use_index=True)
-    #print(stock_df_with_features)
+    stock_df_with_features.plot.line(y="Close", x = "Date", use_index=True)
+    # print(stock_df_with_features)
     train(stock_df_with_features)
 
 if __name__ == "__main__":
